@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import os
 
 st.set_page_config(
     page_title="⛽ Fuel Prices Dashboard",
@@ -28,6 +29,34 @@ label, .stSelectbox label,
 # ── Carregar todos os ficheiros ─────────────────────────────────────────────
 @st.cache_data
 def load_all():
+    use_kaggle = os.getenv("USE_KAGGLE", "false").lower() == "true"
+    
+    if use_kaggle:
+        try:
+            import kagglehub
+            st.info("📡 Carregando dados do Kaggle...")
+            
+            # Load all files from the Kaggle dataset
+            trend   = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "price_trend_monthly.csv")
+            asia    = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "asia_fuel_prices_detailed.csv")
+            subsidy = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "asia_subsidy_tracker.csv")
+            crude   = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "crude_oil_annual.csv")
+            tax     = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "fuel_tax_comparison.csv")
+            global_ = kagglehub.load_dataset("zkskhurram/world-vs-asia-fuel-prices", "global_fuel_prices.csv")
+            
+            # Parse dates
+            if "date" in trend.columns:
+                trend["date"] = pd.to_datetime(trend["date"])
+            if "price_date" in asia.columns:
+                asia["price_date"] = pd.to_datetime(asia["price_date"])
+            if "price_date" in global_.columns:
+                global_["price_date"] = pd.to_datetime(global_["price_date"])
+                
+            return trend, asia, subsidy, crude, tax, global_
+        except Exception as e:
+            st.warning(f"⚠️ Erro ao carregar do Kaggle: {e}. Usando CSVs locais...")
+    
+    # Fallback para CSVs locais
     trend   = pd.read_csv("price_trend_monthly.csv",       parse_dates=["date"])
     asia    = pd.read_csv("asia_fuel_prices_detailed.csv", parse_dates=["price_date"])
     subsidy = pd.read_csv("asia_subsidy_tracker.csv")
