@@ -82,6 +82,12 @@ with st.sidebar:
     st.markdown("---")
     st.caption(f"📊 {len(trend):,} obs · {len(global_df)} países · USD/litro")
 
+    import datetime
+    last_data_date = pd.to_datetime(global_df["price_date"]).max()
+    st.caption(f"🕒 Dados de: {last_data_date.strftime('%d/%m/%Y')}")
+    next_refresh = datetime.datetime.now() + datetime.timedelta(hours=6)
+    st.caption(f"🔄 Próxima atualização: ~{next_refresh.strftime('%H:%M')}")
+
 # ── Filtrar série temporal ──────────────────────────────────────────────────
 tf = trend[
     trend["country"].isin(sel_countries) &
@@ -91,7 +97,16 @@ tf = trend[
 
 # ── HEADER ──────────────────────────────────────────────────────────────────
 st.markdown("# ⛽ Global Fuel Prices Dashboard")
-st.markdown("Preços de combustível · Asia vs Mundo · Subsídios · Petróleo bruto · Impostos")
+
+import datetime
+last_data_date = pd.to_datetime(global_df["price_date"]).max()
+last_loaded     = datetime.datetime.now().strftime("%d/%m/%Y às %H:%M")
+col_title, col_badge = st.columns([3, 1])
+with col_title:
+    st.markdown("Preços de combustível · Asia vs Mundo · Subsídios · Petróleo bruto · Impostos")
+with col_badge:
+    st.info(f"🕒 Dados de {last_data_date.strftime('%d/%m/%Y')}\n\n🔄 Carregado às {last_loaded}")
+
 st.markdown("---")
 
 # ── TABS ────────────────────────────────────────────────────────────────────
