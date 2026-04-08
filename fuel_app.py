@@ -287,9 +287,11 @@ with tab1:
             ("2022-02-01", T["ukraine_lbl"]),
             ("2023-06-01", T["opec_lbl"]),
         ]:
-            fig_line.add_vline(x=dt, line_dash="dot", line_color="#999", opacity=0.6,
-                               annotation_text=label, annotation_position="top right",
-                               annotation_font_size=10)
+            fig_line.add_vline(x=dt, line_dash="dot", line_color="#999", opacity=0.6)
+            fig_line.add_annotation(x=dt, y=1, yref="paper", text=label,
+                                    showarrow=False, xanchor="left",
+                                    font=dict(size=10, color="#999"),
+                                    bgcolor="rgba(255,255,255,0.7)")
         fig_line.update_layout(paper_bgcolor="#ffffff", plot_bgcolor="#fafafa",
                                margin=dict(l=0,r=0,t=10,b=0), height=400,
                                legend=dict(orientation="h", y=1.08))
